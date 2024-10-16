@@ -10,8 +10,14 @@ public class TetroBlock : MonoBehaviour
     public static int height = 20;
     public static int width = 10;
     public Vector3 rotationPoint;
+    private TopBar scorebox;
 
     private static Transform[,] grid = new Transform[width,height];
+
+    private void Start()
+    {
+        scorebox = TopBar.instance;
+    }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow)) 
@@ -53,6 +59,7 @@ public class TetroBlock : MonoBehaviour
         }
     }
 
+    
     void CheckLines() 
     {
         for(int i = height-1;i>=0; i--) 
@@ -61,6 +68,7 @@ public class TetroBlock : MonoBehaviour
             {
                 DeleteLine(i);
                 RowDown(i);
+                scorebox.UpdateScore();
             }
         }
     }
@@ -81,6 +89,7 @@ public class TetroBlock : MonoBehaviour
         {
             Destroy(grid[j,i].gameObject);
             grid[j, i] = null;
+            
         }
     }
 
