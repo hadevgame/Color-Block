@@ -1,65 +1,164 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TetroBlock : MonoBehaviour
 {
+    InputSystem controls;
     private float previousTime;
     public float fallTime = 0.8f;
     public static int height = 20;
     public static int width = 10;
     public Vector3 rotationPoint;
-    private TopBar scorebox;
-
+    private UIManager gamemanager;
+    private UIManager gameover;
     private static Transform[,] grid = new Transform[width,height];
 
+
+    private void Awake()
+    {
+        controls = new InputSystem();
+        controls.Enable();
+
+        controls.grid.MoveLeft.performed += ctx => MoveLeft();
+        controls.grid.MoveRight.performed += ctx => MoveRight();
+        controls.grid.Down.performed += ctx => MoveDown();
+        controls.grid.Rotate.performed += ctx => Rotate();
+    }
     private void Start()
     {
-        scorebox = TopBar.instance;
+        gamemanager = UIManager.instance;
+        gameover = UIManager.instance;
     }
+    /*void Update()
+    {
+        if(Time.timeScale != 0) 
+        {
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                transform.position += new Vector3(-1, 0, 0);
+                if (!ValidMove())
+                {
+                    transform.position -= new Vector3(-1, 0, 0);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                transform.position += new Vector3(1, 0, 0);
+                if (!ValidMove())
+                {
+                    transform.position -= new Vector3(1, 0, 0);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+                if (!ValidMove())
+                {
+                    transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+                }
+            }
+
+            if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+            {
+                transform.position += new Vector3(0, -1, 0);
+                if (!ValidMove())
+                {
+                    transform.position -= new Vector3(0, -1, 0);
+                    AddToGrid();
+                    CheckLines();
+                    this.enabled = false;
+                    FindObjectOfType<SpawnBlock>().Spawn();
+                }
+                previousTime = Time.time;
+            }
+            CheckGameOver();
+        }
+    }*/
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) 
+        if (Time.timeScale != 0)
         {
-            transform.position += new Vector3(-1, 0, 0);
-            if (!ValidMove()) 
+            if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow)|| (Input.GetKey(KeyCode.S)) ? fallTime / 10 : fallTime))
             {
-                transform.position -= new Vector3(-1, 0, 0);
+                transform.position += new Vector3(0, -1, 0);
+                if (!ValidMove())
+                {
+                    transform.position -= new Vector3(0, -1, 0);
+                    AddToGrid();
+                    CheckLines();
+                    this.enabled = false;
+                    FindObjectOfType<SpawnBlock>().Spawn();
+                }
+                previousTime = Time.time;
             }
+            CheckGameOver();
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            transform.position += new Vector3(1, 0, 0);
-            if (!ValidMove())
-            {
-                transform.position -= new Vector3(1, 0, 0);
-            }
-        }else if (Input.GetKeyDown(KeyCode.UpArrow)) 
-        {
-            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
-            if (!ValidMove())
-            {
-                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
-            }
-        }
+    }
+    private void OnEnable()
+    {
+        controls.Enable();
+    }
 
-        if(Time.time -previousTime> (Input.GetKey(KeyCode.DownArrow) ?fallTime/10 : fallTime))
+    private void OnDisable()
+    {
+        controls.Disable();
+    }
+    public void MoveLeft()
+    {
+        transform.position += new Vector3(-1, 0, 0);
+        if (!ValidMove())
         {
-            transform.position += new Vector3(0, -1, 0);
-            if (!ValidMove())
-            {
-                transform.position -= new Vector3(0, -1, 0);
-                AddToGrid();
-                CheckLines();
-                this.enabled = false;
-                FindObjectOfType<SpawnBlock>().Spawn();
-            }
-            previousTime = Time.time;
+            transform.position -= new Vector3(-1, 0, 0);
         }
     }
 
-    
+    public void MoveRight()
+    {
+        transform.position += new Vector3(1, 0, 0);
+        if (!ValidMove())
+        {
+            transform.position -= new Vector3(1, 0, 0);
+        }
+    }
+
+    public void Rotate()
+    {
+        transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+        if (!ValidMove())
+        {
+            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+        }
+    }
+
+    public void MoveDown()
+    {
+        transform.position += new Vector3(0, -1, 0);
+        if (!ValidMove())
+        {
+            transform.position -= new Vector3(0, -1, 0);
+            AddToGrid();
+            CheckLines();
+            this.enabled = false;
+            FindObjectOfType<SpawnBlock>().Spawn();
+        }
+        previousTime = Time.time;
+
+    }
+
+    void CheckGameOver()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            if (grid[i, height - 1] != null)
+            {
+                gameover.GameOver();
+            }
+        }
+    }
     void CheckLines() 
     {
         for(int i = height-1;i>=0; i--) 
@@ -68,7 +167,7 @@ public class TetroBlock : MonoBehaviour
             {
                 DeleteLine(i);
                 RowDown(i);
-                scorebox.UpdateScore();
+                gamemanager.UpdateScore();
             }
         }
     }
@@ -117,6 +216,7 @@ public class TetroBlock : MonoBehaviour
 
             grid[roundedX, roundedY] = child;       
         }
+
     }
     bool ValidMove() 
     {

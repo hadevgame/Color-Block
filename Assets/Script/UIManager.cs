@@ -4,12 +4,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-public class TopBar : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
-    public static TopBar instance;
+    public static UIManager instance;
     public TextMeshProUGUI scoreText;
+    public GameObject gameoverUI;
     private int curScore = 0;
 
+    
     public void Awake()
     {
         if (!instance)
@@ -27,4 +29,24 @@ public class TopBar : MonoBehaviour
         curScore += 100;
         scoreText.text = curScore.ToString() ;
     }
+
+    public void GameOver() 
+    {
+        gameoverUI.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void Restart() 
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Time.timeScale = 1f;
+    }
+
+    public void Quit() 
+    {
+        SceneManager.LoadScene("MainMenu");
+        Time.timeScale = 1f;
+        
+    }
+   
 }
