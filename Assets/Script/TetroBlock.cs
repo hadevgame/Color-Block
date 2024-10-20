@@ -9,12 +9,13 @@ public class TetroBlock : MonoBehaviour
     InputSystem controls;
     private float previousTime;
     public float fallTime = 0.8f;
-    public static int height = 20;
+    public static int height = 21;
     public static int width = 10;
     public Vector3 rotationPoint;
     private UIManager gamemanager;
-    private UIManager gameover;
+   
     private static Transform[,] grid = new Transform[width,height];
+    
 
 
     private void Awake()
@@ -30,7 +31,7 @@ public class TetroBlock : MonoBehaviour
     private void Start()
     {
         gamemanager = UIManager.instance;
-        gameover = UIManager.instance;
+        
     }
     /*void Update()
     {
@@ -69,17 +70,19 @@ public class TetroBlock : MonoBehaviour
                     transform.position -= new Vector3(0, -1, 0);
                     AddToGrid();
                     CheckLines();
+                    CheckGameOver();
                     this.enabled = false;
                     FindObjectOfType<SpawnBlock>().Spawn();
                 }
                 previousTime = Time.time;
             }
-            CheckGameOver();
+            
         }
     }*/
 
     void Update()
     {
+        
         if (Time.timeScale != 0)
         {
             if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow)|| (Input.GetKey(KeyCode.S)) ? fallTime / 10 : fallTime))
@@ -90,12 +93,14 @@ public class TetroBlock : MonoBehaviour
                     transform.position -= new Vector3(0, -1, 0);
                     AddToGrid();
                     CheckLines();
+                    CheckGameOver();
                     this.enabled = false;
                     FindObjectOfType<SpawnBlock>().Spawn();
                 }
                 previousTime = Time.time;
+                
             }
-            CheckGameOver();
+            
         }
     }
     private void OnEnable()
@@ -136,32 +141,48 @@ public class TetroBlock : MonoBehaviour
 
     public void MoveDown()
     {
-        transform.position += new Vector3(0, -1, 0);
-        if (!ValidMove())
-        {
-            transform.position -= new Vector3(0, -1, 0);
-            AddToGrid();
-            CheckLines();
-            this.enabled = false;
-            FindObjectOfType<SpawnBlock>().Spawn();
-        }
-        previousTime = Time.time;
-
+            transform.position += new Vector3(0, -1, 0);
+           
+            if (!ValidMove())
+            {
+                transform.position -= new Vector3(0, -1, 0);
+                AddToGrid();
+                CheckLines();
+                CheckGameOver();
+                this.enabled = false;
+                FindObjectOfType<SpawnBlock>().Spawn();
+            }
+            previousTime = Time.time;
+        
     }
 
     void CheckGameOver()
     {
         for (int i = 0; i < width; i++)
         {
-            if (grid[i, height - 1] != null)
+            if (grid[i, height -1] != null && grid[i,height-2] !=null )
             {
-                gameover.GameOver();
+                gamemanager.DisplayGameOver();
+                ResetGrid();
+                controls.Disable();
             }
         }
     }
+
+    void ResetGrid()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                grid[x, y] = null; 
+            }
+        }
+    }
+
     void CheckLines() 
     {
-        for(int i = height-1;i>=0; i--) 
+        for(int i = height-2;i>=0; i--) 
         {
             if (HasLine(i)) 
             {
@@ -194,7 +215,7 @@ public class TetroBlock : MonoBehaviour
 
     void RowDown(int i) 
     {
-        for(int z = i; z < height; z++) 
+        for(int z = i; z < height-1; z++) 
         {
             for(int j=0;j<width;j++) 
             {
@@ -214,7 +235,8 @@ public class TetroBlock : MonoBehaviour
             int roundedX = Mathf.RoundToInt(child.transform.position.x);
             int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
-            grid[roundedX, roundedY] = child;       
+            grid[roundedX, roundedY] = child;
+            
         }
 
     }
@@ -225,7 +247,7 @@ public class TetroBlock : MonoBehaviour
             int roundedX = Mathf.RoundToInt(child.transform.position.x);
             int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
-            if (roundedX < 0 || roundedX >= width  || roundedY < 0 || roundedY >= height)
+            if (roundedX < 0 || roundedX >= width  || roundedY < 0 || roundedY >= height-1)
             {
                 return false;
             }

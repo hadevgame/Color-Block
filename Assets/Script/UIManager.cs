@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
     public TextMeshProUGUI scoreText;
     public GameObject gameoverUI;
+
     private int curScore = 0;
 
     
@@ -30,23 +31,24 @@ public class UIManager : MonoBehaviour
         scoreText.text = curScore.ToString() ;
     }
 
-    public void GameOver() 
+    public void DisplayGameOver()
     {
         gameoverUI.SetActive(true);
         Time.timeScale = 0;
     }
 
-    public void Restart() 
+    public void Restart()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
         Time.timeScale = 1f;
     }
 
-    public void Quit() 
+    public void Quit()
     {
         SceneManager.LoadScene("MainMenu");
         Time.timeScale = 1f;
-        
+
     }
-   
+
 }
