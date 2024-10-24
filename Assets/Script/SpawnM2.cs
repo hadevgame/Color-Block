@@ -17,6 +17,6 @@ public class SpawnM2 : MonoBehaviour
     public void Spawn()
     {
         block =Instantiate(blocks[Random.RandomRange(0, blocks.Length)], transform.position, Quaternion.identity);
-        block.transform.SetParent(this.transform);
+        //block.transform.SetParent(this.transform);
     }
 }
