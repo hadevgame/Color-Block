@@ -16,7 +16,7 @@ public class TetroBlock : MonoBehaviour
    
     private static Transform[,] grid = new Transform[width,height];
     
-
+    
 
     private void Awake()
     {

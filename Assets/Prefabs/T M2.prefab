@@ -295,6 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 0}
+  parentAfterDrag: {fileID: 0}
 --- !u!1 &5472118529615112475
 GameObject:
   m_ObjectHideFlags: 0

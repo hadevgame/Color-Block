@@ -131,6 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 0}
+  parentAfterDrag: {fileID: 0}
 --- !u!225 &6525745801404117123
 CanvasGroup:
   m_ObjectHideFlags: 0
